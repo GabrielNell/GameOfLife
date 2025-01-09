@@ -67,5 +67,69 @@ void keyPressed() {
   if (keyCode == 32) {
     computeGenerations = !computeGenerations;
   }
+}
+
+
+
+class Cell {
+  private boolean alive, toDie, toRevive;
+  private int x, y;
+  Cell(int x_, int y_, boolean alive_) {
+    x = x_;
+    y = y_;
+    alive = alive_;
+  }
+
+  public void show() {
+    if (alive) {
+      fill(sin(0.05*time) * (100 - x * 100 / boardWidth) + 150, sin(0.05*time+1) * (100 - y * 100 / boardHeight) + 155, sin(0.05*time + 2) * (100 - y * 100 / boardHeight) + 155);
+    } else {
+      fill(0);
+    }
+    rect(x * cellWidth, y * cellWidth, cellWidth, cellWidth);
+  }
+  public int getX() {
+    return x;
+  }
+
+  public int getY() {
+    return y;
+  }
   
+  public void calculateLife() {
+    if (numNeighbors() == 3 && !alive) {
+      toDie = false;
+      toRevive = true;
+    } else if (alive && (numNeighbors() == 2 || numNeighbors() == 3)) {
+      toDie = false;
+      toRevive = false;
+    } else {
+      toDie = true;
+      toRevive = false;
+    }
+  }
+
+  void reevaluateLife() {
+    if (toDie) {
+      alive = false;
+    }
+    if (toRevive) {
+      alive = true;
+    }
+  }
+  
+  int numNeighbors() {
+    int numNeighbors_ = 0;
+    for (Cell[] col : board) {
+      for (Cell cell : col) {
+        if (((cell.getX() == x + 1 || cell.getX() == x - 1 || cell.getX() == x) && (cell.getY() == y + 1 || cell.getY() == y - 1 || cell.getY() == y)) && cell.alive) {
+          numNeighbors_ += 1;
+        }
+      }
+    }
+    if (alive) {
+      numNeighbors_ -= 1;
+    }
+    return numNeighbors_;
+  }
 }
